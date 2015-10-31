@@ -11,9 +11,6 @@
 #ifndef INCLUDED_SERVER_H
 #define INCLUDED_SERVER_H
 
-#include <ctime>
-#include <iostream>
-#include <string>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>

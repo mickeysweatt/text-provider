@@ -37,15 +37,34 @@ public:
         return socket_;
     }
 
-    void start()
+    std::string make_string(boost::asio::streambuf& streambuf)
+    {
+    return {buffers_begin(streambuf.data()),
+         buffers_end(streambuf.data())};
+    }
+
+    int process_request()
     {
         message_ = make_daytime_string();
-
-        boost::asio::async_write(socket_, boost::asio::buffer(message_),
-                                 boost::bind(&tcp_connection::handle_write, shared_from_this(),
-                                             boost::asio::placeholders::error,
-                                             boost::asio::placeholders::bytes_transferred));
+        std::string command = get_command();
+        if (command == "QUIT\r\n") {
+            return 0;
+        }
+        else if (command == "SHUTDOWN\r\n") {
+            return 1;
+        }
+        else {
+            return process_request();
+        }
     }
+
+    std::string get_command() {
+        boost::asio::streambuf read_buffer;
+        auto bytes_transferred = read_until(socket_, read_buffer, '\n');
+        std::string command = make_string(read_buffer);
+        return command;
+    }
+
 
     std::string make_daytime_string()
     {
@@ -81,8 +100,9 @@ public:
 private:
     void start_accept()
     {
-        tcp_connection::pointer new_connection =
-        tcp_connection::create(acceptor_.get_io_service());
+        tcp_connection::pointer new_connection = tcp_connection::create(
+            acceptor_.get_io_service());
+        std::cout << "Waiting for connection" << std::endl;
 
         acceptor_.async_accept(new_connection->socket(),
                                boost::bind(&tcp_server::handle_accept, this, new_connection,
@@ -92,12 +112,15 @@ private:
     void handle_accept(tcp_connection::pointer new_connection,
                        const boost::system::error_code& error)
     {
+        std::cout << "Accepting connection" << std::endl;
+        int status = -1;
         if (!error)
         {
-            new_connection->start();
+            status = new_connection->process_request();
         }
-
-        start_accept();
+        if (0 == status) {
+            start_accept();
+        }
     }
 
     tcp::acceptor acceptor_;

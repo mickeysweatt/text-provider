@@ -27,51 +27,16 @@ class tcp_connection
 public:
     typedef boost::shared_ptr<tcp_connection> pointer;
 
-    static pointer create(boost::asio::io_service& io_service)
-    {
-        return pointer(new tcp_connection(io_service));
-    }
+    static pointer create(boost::asio::io_service& io_service);
 
     tcp::socket& socket()
     {
         return socket_;
     }
 
-    std::string make_string(boost::asio::streambuf& streambuf)
-    {
-    return {buffers_begin(streambuf.data()),
-         buffers_end(streambuf.data())};
-    }
+    int process_request();
 
-    int process_request()
-    {
-        message_ = make_daytime_string();
-        std::string command = get_command();
-        if (command == "QUIT\r\n") {
-            return 0;
-        }
-        else if (command == "SHUTDOWN\r\n") {
-            return 1;
-        }
-        else {
-            return process_request();
-        }
-    }
-
-    std::string get_command() {
-        boost::asio::streambuf read_buffer;
-        auto bytes_transferred = read_until(socket_, read_buffer, '\n');
-        std::string command = make_string(read_buffer);
-        return command;
-    }
-
-
-    std::string make_daytime_string()
-    {
-        using namespace std; // For time_t, time and ctime;
-        time_t now = time(0);
-        return ctime(&now);
-    }
+    std::string get_command();
 
 private:
     tcp_connection(boost::asio::io_service& io_service)
@@ -98,30 +63,10 @@ public:
     }
 
 private:
-    void start_accept()
-    {
-        tcp_connection::pointer new_connection = tcp_connection::create(
-            acceptor_.get_io_service());
-        std::cout << "Waiting for connection" << std::endl;
-
-        acceptor_.async_accept(new_connection->socket(),
-                               boost::bind(&tcp_server::handle_accept, this, new_connection,
-                                           boost::asio::placeholders::error));
-    }
+    void start_accept();
 
     void handle_accept(tcp_connection::pointer new_connection,
-                       const boost::system::error_code& error)
-    {
-        std::cout << "Accepting connection" << std::endl;
-        int status = -1;
-        if (!error)
-        {
-            status = new_connection->process_request();
-        }
-        if (0 == status) {
-            start_accept();
-        }
-    }
+                       const boost::system::error_code& error);
 
     tcp::acceptor acceptor_;
 };

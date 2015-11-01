@@ -34,7 +34,7 @@ class SimpleLocalCacheTextProvider : public TextProviderProtocol ,
  	size_t cache_start_line_;
  	size_t cache_end_line_;
  	size_t cache_max_bytes_;
- 	mutable size_t files_num_lines_;
+ 	size_t files_num_lines_;
 };
 
 

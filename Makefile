@@ -10,7 +10,8 @@ LFLAGS=-L$(LDIR) -lboost_system -lstdc++
 _DEPS = server.h TextProviderProtocol.h
 DEPS = $(patsubst %,$(SRCDIR)/%,$(_DEPS))
 
-_OBJ = main.o server.o TextProviderProtocol.o simple-local-cache-text-provider.o
+_OBJ = main.o server.o TextProviderProtocol.o simple-local-cache-text-provider.o \
+	   cache-protocol.o random-access-cache.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: src/%.cpp $(DEPS)

@@ -1,5 +1,5 @@
 //
-// async_tcp_echo_server.cpp
+//
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 // Copyright (c) 2003-2013 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -7,6 +7,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
+// An asynchronous tcp server using boost asio based on:
+// http://www.boost.org/doc/libs/1_54_0/doc/html/boost_asio/example/cpp11/echo/async_tcp_echo_server.cpp
 
 #ifndef INCLUDED_SERVER_H
 #define INCLUDED_SERVER_H
@@ -22,6 +24,7 @@
 using boost::asio::ip::tcp;
 
 class session
+// Encapsulates a connection to a client
   : public std::enable_shared_from_this<session>
 {
 public:
@@ -38,10 +41,13 @@ public:
 
 private:
   int do_read();
+  // Read from a client, return when client ends session.
 
   int process_command(size_t length);
+  // The core implementaion of the specificed protocol
 
   int do_write(std::ostream& output);
+  // Response to the user
 
   tcp::socket socket_;
   enum { max_length = 1024 };

@@ -11,8 +11,13 @@ _DEPS = server.h TextProviderProtocol.h
 DEPS = $(patsubst %,$(SRCDIR)/%,$(_DEPS))
 
 _OBJ = main.o server.o TextProviderProtocol.o simple-local-cache-text-provider.o \
-	   cache-protocol.o random-access-cache.o optimistic-prefetch-cache.o lru-cache.o
+	   cache-protocol.o random-access-cache.o optimistic-prefetch-cache.o \
+	   lru-cache.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+MKDIR_P = mkdir -p
+
+OUT_DIR = ${ODIR}
 
 $(ODIR)/%.o: src/%.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -20,7 +25,14 @@ $(ODIR)/%.o: src/%.cpp $(DEPS)
 text-provider: $(OBJ)
 	$(CC) -o $@ $^ $(LFLAGS) $(CFLAGS)
 
-.PHONY: clean
+directories: ${OUT_DIR}
+
+${OUT_DIR}:
+	${MKDIR_P} ${OUT_DIR}
+
+all: directories text-provider
+
+.PHONY: directories
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~

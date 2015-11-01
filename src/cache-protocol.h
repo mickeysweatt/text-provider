@@ -5,9 +5,9 @@
 
 class CacheProtocol {
   public:
-	virtual ~CacheProtocol() = default;
+	virtual ~CacheProtocol();
 
-	virtual bool get_line_if_cached(std::string *line);
+	virtual bool get_line_if_cached(size_t line_num, std::string *line) = 0;
 
 	virtual size_t cache_size() const = 0;
 };

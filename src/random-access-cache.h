@@ -9,7 +9,7 @@ class RandomAccessCache : public CacheProtocol {
 
 	~RandomAccessCache() override {};
 
-	bool get_line_if_cached(std::string *line) override {
+	bool get_line_if_cached(size_t line_num, std::string *line) override {
 		return false;
 	}
 

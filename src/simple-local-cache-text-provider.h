@@ -9,6 +9,7 @@
 #define INCLUDED_SIMPLE_LOCAL_CACHE_TEXT_PROVIDER
 
 #include "TextProviderProtocol.h"
+#include "cache-protocol.h"
 #include <string>
 #include <vector>
 #include <stdint.h>
@@ -18,24 +19,22 @@ class SimpleLocalCacheTextProvider : public TextProviderProtocol ,
 {
   public:
   	SimpleLocalCacheTextProvider(const std::string& filename,
-  								 size_t start_line,
-  								 size_t max_line,
-  								 size_t max_bytes = SIZE_MAX);
+  								 std::shared_ptr<CacheProtocol> cache)
+  	: filename_(filename)
+  	, cache_(cache)
+  	{
+  	}
 
   	~SimpleLocalCacheTextProvider() override = default;
 
 	std::string read_n_th_line(size_t n) override;
 
-	size_t file_length();
+	size_t file_length() override;
 
  private:
- 	std::string filename_;
- 	std::vector<std::string> cache_;
- 	size_t cache_start_line_;
- 	size_t cache_end_line_;
- 	size_t cache_max_bytes_;
  	size_t files_num_lines_;
-};
-
+ 	std::string filename_;
+ 	std::shared_ptr<CacheProtocol> cache_;
+ };
 
 #endif /* INCLUDED_SIMPLE_LOCAL_CACHE_TEXT_PROVIDER */

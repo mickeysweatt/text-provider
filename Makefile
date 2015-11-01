@@ -4,13 +4,13 @@ LDIR = /usr/local/Cellar/boost/1.58.0/lib/
 SRCDIR = src
 ODIR=obj
 
-CFLAGS=-I$(IDIR) --std=c++11
+CFLAGS=-I$(IDIR) --std=c++0x
 LFLAGS=-L$(LDIR) -lboost_system -lstdc++
 
-_DEPS = server.h
+_DEPS = server.h TextProviderProtocol.h
 DEPS = $(patsubst %,$(SRCDIR)/%,$(_DEPS))
 
-_OBJ = main.o server.o
+_OBJ = main.o server.o TextProviderProtocol.o simple-local-cache-text-provider.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: src/%.cpp $(DEPS)

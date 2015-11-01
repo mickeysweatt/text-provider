@@ -16,6 +16,8 @@
 #include <memory>
 #include <utility>
 #include <boost/asio.hpp>
+#include <boost/iostreams/stream_buffer.hpp>
+#include "TextProviderProtocol.h"
 
 using boost::asio::ip::tcp;
 
@@ -23,8 +25,9 @@ class session
   : public std::enable_shared_from_this<session>
 {
 public:
-  session(tcp::socket socket)
+  session(tcp::socket socket, std::shared_ptr<TextProviderProtocol> provider)
     : socket_(std::move(socket))
+    , provider_(provider)
   {
   }
 
@@ -34,64 +37,35 @@ public:
   }
 
 private:
-  int do_read()
-  {
-    auto self(shared_from_this());
-    socket_.async_read_some(boost::asio::buffer(data_, max_length),
-        [this, self](boost::system::error_code ec, std::size_t length)
-        {
-          if (!ec)
-          {
-            int status = process_command(length);
-            if (status == 0) {
-                return 0;
-            }
-            else if (status != 0) {
-                socket_.get_io_service().stop();
-            }
-            else {
-                return do_read();
-            }
-          }
-          return -1;
-        });
-    return 0;
-  }
+  int do_read();
 
   int process_command(size_t length);
 
-  void do_write(std::size_t length)
-  {
-    auto self(shared_from_this());
-    boost::asio::async_write(socket_, boost::asio::buffer(data_, length),
-        [this, self](boost::system::error_code ec, std::size_t /*length*/)
-        {
-          if (!ec)
-          {
-            do_read();
-          }
-        });
-  }
+  int do_write(std::ostream& output);
 
   tcp::socket socket_;
   enum { max_length = 1024 };
   char data_[max_length];
+  boost::asio::streambuf write_buffer_;
+  std::shared_ptr<TextProviderProtocol> provider_;
 };
 
 class tcp_server
 {
 public:
-  tcp_server(boost::asio::io_service& io_service)
+  tcp_server(boost::asio::io_service& io_service,
+             std::shared_ptr<TextProviderProtocol> provider)
     : acceptor_(io_service, tcp::endpoint(tcp::v4(), 10322)),
-      socket_(io_service)
+      socket_(io_service),
+      provider_(provider)
   {
     do_accept();
   }
 
 private:
   void do_accept();
-
   tcp::acceptor acceptor_;
   tcp::socket socket_;
+  std::shared_ptr<TextProviderProtocol> provider_;
 };
 #endif

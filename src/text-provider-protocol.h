@@ -1,10 +1,6 @@
 //
-//  TextProviderProtocol.h
+//  text-provider-protocol.h
 //
-//  Created by admin on 10/29/15.
-//  Copyright (c) 2015 admin. All rights reserved.
-//
-
 #ifndef INCLUDED_TEXT_PROVIDER_PROTOCOL
 #define INCLUDED_TEXT_PROVIDER_PROTOCOL
 

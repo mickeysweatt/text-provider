@@ -22,22 +22,24 @@ using std::string;
 int session::process_command(size_t length)
 {
   string command(data_, length);
-  if (command == "QUIT\r\n") {
+  if (strcmp(data_,"SHUTDOWN\r\n") == 0) {
     return 0;
   }
   else if (strcmp(data_,"SHUTDOWN\r\n") == 0 ) {
     return 1;
   }
-  else {
+  else { // It may be a GET or an error
     std::istringstream iss(data_, strlen(data_));
     std::vector<string> tokens{std::istream_iterator<  string>{iss},
                                std::istream_iterator<string>{}};
      std::ostream output(&write_buffer_);
      bool success = false;
+      // If a get command
       if (tokens.size() == 2 || tokens[0] == "GET") {
         size_t line_num = atol(tokens[1].c_str());
         if (line_num > 0 && line_num < provider_->file_length()) {
-          output << "OK\r\n" << provider_->read_n_th_line(line_num) << std::endl;
+          output << "OK\r\n" << provider_->read_n_th_line(line_num)
+                 << std::endl;
           success = true;
         }
       }
@@ -76,27 +78,27 @@ int session::do_write(std::ostream& output)
 {
   auto self(shared_from_this());
   boost::asio::async_write(socket_, write_buffer_,
-      [this, self] (boost::system::error_code ec, std::size_t /*length*/)
+    [this, self] (boost::system::error_code ec, std::size_t /*length*/)
+    {
+      if (!ec)
       {
-        if (!ec)
-        {
-          return do_read();
-        }
-        return -1;
-      });
+        return do_read();
+      }
+      return -1;
+    });
   return 0;
 }
 
 void tcp_server::do_accept()
 {
   acceptor_.async_accept(socket_,
-      [this](boost::system::error_code ec)
+    [this](boost::system::error_code ec)
+    {
+      if (!ec)
       {
-        if (!ec)
-        {
-          std::make_shared<session>(std::move(socket_), provider_)->start();
-        }
+        std::make_shared<session>(std::move(socket_), provider_)->start();
+      }
 
-        do_accept();
-      });
+      do_accept();
+    });
 }

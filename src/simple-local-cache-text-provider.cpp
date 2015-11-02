@@ -4,7 +4,6 @@
 
 using std::string;
 
-
 size_t SimpleLocalCacheTextProvider::file_length()
 {
 	if (files_num_lines_ == 0) {
@@ -16,6 +15,8 @@ size_t SimpleLocalCacheTextProvider::file_length()
 std::string SimpleLocalCacheTextProvider::read_n_th_line(size_t n)
 {
 	string line;
-	cache_->get_line_if_cached(n, &line);
+	if (!cache_->get_line_if_cached(n, &line)) {
+		line = FileUtils::get_nth_line(filename_, n);
+	}
 	return line;
 }

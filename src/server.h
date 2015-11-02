@@ -19,16 +19,14 @@
 #include <utility>
 #include <boost/asio.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
-#include "TextProviderProtocol.h"
+#include "text-provider-protocol.h"
 
-using boost::asio::ip::tcp;
-
-class session
+class session : public std::enable_shared_from_this<session>
 // Encapsulates a connection to a client
-  : public std::enable_shared_from_this<session>
 {
 public:
-  session(tcp::socket socket, std::shared_ptr<TextProviderProtocol> provider)
+  session(boost::asio::ip::tcp::socket socket,
+          std::shared_ptr<TextProviderProtocol> provider)
     : socket_(std::move(socket))
     , provider_(provider)
   {
@@ -49,7 +47,7 @@ private:
   int do_write(std::ostream& output);
   // Response to the user
 
-  tcp::socket socket_;
+  boost::asio::ip::tcp::socket socket_;
   enum { max_length = 1024 };
   char data_[max_length];
   boost::asio::streambuf write_buffer_;
@@ -61,7 +59,9 @@ class tcp_server
 public:
   tcp_server(boost::asio::io_service& io_service,
              std::shared_ptr<TextProviderProtocol> provider)
-    : acceptor_(io_service, tcp::endpoint(tcp::v4(), 10322)),
+    : acceptor_(io_service
+    , boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),
+                                     10322)),
       socket_(io_service),
       provider_(provider)
   {
@@ -70,8 +70,8 @@ public:
 
 private:
   void do_accept();
-  tcp::acceptor acceptor_;
-  tcp::socket socket_;
+  boost::asio::ip::tcp::acceptor acceptor_;
+  boost::asio::ip::tcp::socket socket_;
   std::shared_ptr<TextProviderProtocol> provider_;
 };
 #endif

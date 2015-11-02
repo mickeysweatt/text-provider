@@ -8,7 +8,7 @@
 #ifndef INCLUDED_SIMPLE_LOCAL_CACHE_TEXT_PROVIDER
 #define INCLUDED_SIMPLE_LOCAL_CACHE_TEXT_PROVIDER
 
-#include "TextProviderProtocol.h"
+#include "text-provider-protocol.h"
 #include "cache-protocol.h"
 #include <string>
 #include <vector>

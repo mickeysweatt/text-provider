@@ -1,6 +1,9 @@
 #include "optimistic-prefetch-cache.h"
+
 #include <fstream>
+
 #include "util/file-utils.h"
+
 using std::string;
 
 OptimisticPrefetchCache::OptimisticPrefetchCache(

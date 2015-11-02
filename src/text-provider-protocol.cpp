@@ -6,4 +6,4 @@
 //  Copyright (c) 2015 admin. All rights reserved.
 //
 
-#include "TextProviderProtocol.h"
+#include "text-provider-protocol.h"

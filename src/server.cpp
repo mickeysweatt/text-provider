@@ -21,7 +21,6 @@ using std::string;
 
 int session::process_command(size_t length)
 {
-  string command(data_, length);
   if (strcmp(data_,"SHUTDOWN\r\n") == 0) {
     return 0;
   }
@@ -29,7 +28,8 @@ int session::process_command(size_t length)
     return 1;
   }
   else { // It may be a GET or an error
-    std::istringstream iss(data_, strlen(data_));
+    string command(data_, length);
+    std::istringstream iss(command);
     std::vector<string> tokens{std::istream_iterator<  string>{iss},
                                std::istream_iterator<string>{}};
      std::ostream output(&write_buffer_);

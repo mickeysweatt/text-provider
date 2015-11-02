@@ -7,6 +7,8 @@
 //  FileUtils: A utility class for interacting with files.
 
 #include <fstream>
+#include <iterator>
+#include <algorithm>
 
                     // ================
                     // class FileUtils

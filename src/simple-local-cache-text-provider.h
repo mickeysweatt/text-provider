@@ -12,6 +12,7 @@
 #include "cache-protocol.h"
 #include <string>
 #include <vector>
+#include <memory>
 #include <stdint.h>
 
 class SimpleLocalCacheTextProvider : public TextProviderProtocol ,

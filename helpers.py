@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import string, random
 
 def generate_random_string(max_len = 100, chars=string.ascii_uppercase + \

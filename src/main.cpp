@@ -5,6 +5,7 @@
 #include "util/file-utils.h"
 #include "text-provider-protocol.h"
 #include "optimistic-prefetch-cache.h"
+#include "lru-line-cache.h"
 #include "simple-local-cache-text-provider.h"
 
 int main(int argc, char *argv[])
@@ -21,11 +22,16 @@ int main(int argc, char *argv[])
     std::shared_ptr<TextProviderProtocol> provider;
     std::shared_ptr<CacheProtocol> cache;
     // If the file is small enough to cache the whole thing do so.
-    size_t cache_size =
-        file_length <= SMALL_FILE_SIZE ? file_length : SMALL_FILE_SIZE;
-    cache = std::make_shared<OptimisticPrefetchCache>(filename,
-                                                      0,
-                                                      cache_size);
+    if (file_length <= SMALL_FILE_SIZE) {
+      cache = std::make_shared<OptimisticPrefetchCache>(filename,
+                                                        0,
+                                                        file_length);
+    }
+    // otherwise use a large lru cache
+    else {
+      cache = std::make_shared<LruLineCache>(filename,
+                                             SMALL_FILE_SIZE);
+    }
     provider = std::make_shared<SimpleLocalCacheTextProvider>(filename,
                                                               cache);
     boost::asio::io_service io_service;

@@ -9,17 +9,17 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
+#include <boost/asio.hpp>
+#include <cstdlib>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <utility>
-#include <boost/asio.hpp>
-#include <cstdlib>
 
 using boost::asio::ip::tcp;
 using std::string;
 
-int session::process_command(size_t length)
+int Session::process_command(size_t length)
 {
   if (strcmp(data_,"SHUTDOWN\r\n") == 0) {
     return 0;
@@ -50,7 +50,7 @@ int session::process_command(size_t length)
   }
 }
 
-int session::do_read()
+int Session::do_read()
 {
   auto self(shared_from_this());
   socket_.async_read_some(boost::asio::buffer(data_, max_length),
@@ -74,7 +74,7 @@ int session::do_read()
 return 0;
 }
 
-int session::do_write(std::ostream& output)
+int Session::do_write(std::ostream& output)
 {
   auto self(shared_from_this());
   boost::asio::async_write(socket_, write_buffer_,
@@ -89,14 +89,25 @@ int session::do_write(std::ostream& output)
   return 0;
 }
 
-void tcp_server::do_accept()
+TcpServer::TcpServer(boost::asio::io_service&               io_service,
+           std::shared_ptr<TextProviderProtocol> provider)
+  : acceptor_(io_service
+  , boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(),
+                                   10322)),
+    socket_(io_service),
+    provider_(provider)
+{
+  do_accept();
+}
+
+void TcpServer::do_accept()
 {
   acceptor_.async_accept(socket_,
     [this](boost::system::error_code ec)
     {
       if (!ec)
       {
-        std::make_shared<session>(std::move(socket_), provider_)->start();
+        std::make_shared<Session>(std::move(socket_), provider_)->start();
       }
 
       do_accept();

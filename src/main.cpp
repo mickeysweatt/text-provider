@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     provider = std::make_shared<SimpleLocalCacheTextProvider>(filename,
                                                               cache);
     boost::asio::io_service io_service;
-    tcp_server server(io_service, provider);
+    TcpServer server(io_service, provider);
     io_service.run();
   }
   catch (std::exception& e)

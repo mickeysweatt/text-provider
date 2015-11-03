@@ -1,6 +1,10 @@
 #include "lru-line-cache.h"
 #include "util/file-utils.h"
 
+                    // - - - - - - - - - -
+                    // class LruLineCache
+                    // - - - - - - - - - -
+// MANIPULATORS
 bool LruLineCache::get_line_if_cached(size_t line_num, std::string *line)
 {
   if (!cache_.exists(line_num)) {

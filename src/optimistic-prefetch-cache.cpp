@@ -8,17 +8,18 @@ using std::string;
 
 OptimisticPrefetchCache::OptimisticPrefetchCache(
 	const string& filename,
-	size_t start_line,
-	size_t max_line,
-	size_t max_bytes)
-:  	filename_(filename),
-	cache_start_line_(start_line),
- 	cache_end_line_(max_line),
- 	cache_max_bytes_(max_bytes)
+	size_t        start_line,
+	size_t 		  end_line,
+	size_t 		  max_bytes)
+  : filename_(filename)
+  , cache_start_line_(start_line)
+  , cache_end_line_(end_line)
+  , cache_max_bytes_(max_bytes)
 {
 }
 
-bool OptimisticPrefetchCache::get_line_if_cached(size_t line_num, std::string *line) {
+bool OptimisticPrefetchCache::get_line_if_cached(size_t  line_num,
+												 string *line) {
 	std::ifstream input(filename_.c_str());
 	// if the line is not in cache, reset the cache to start at this line and
 	// get all the lines that potentially can fit into cache
